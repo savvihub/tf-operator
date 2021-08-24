@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tf-operator-entrypoint
+  namespace: floyd
+data:
+  entrypoint.sh: |-
+    #!/bin/bash
+    git clone https://github.com/savvihub/tf-operator.git
+    cd tf-operator
+    git checkout savvihub
+    python examples/savvihub/dist-mnist/dist_mnist.py
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tf-operator-ps
+  namespace: floyd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      v1.cpu-0.mem-1: "true"
+  template:
+    metadata:
+      labels:
+        v1.cpu-0.mem-1: "true"
+        app: "ps"
+    spec:
+      containers:
+        - name: tf-operator
+          image: savvihub/kernels:py37-cuda11.0.full-gpu
+          resources:
+            limits:
+              memory: 1Gi
+          command:
+            - /bin/entrypoint.sh
+          volumeMounts:
+            - name: configmap-volume
+              mountPath: /bin/entrypoint.sh
+              readOnly: true
+              subPath: entrypoint.sh
+          ports:
+            - containerPort: 2222
+          env:
+            - name: TF_CONFIG
+              value: |
+                {"cluster":{"ps":["tf-operator-ps.floyd.svc.cluster.local:2222"],"worker":["tf-operator-worker.floyd.svc.cluster.local:2222"]},"task":{"type":"ps","index":0}}
+      volumes:
+        - name: configmap-volume
+          configMap:
+            defaultMode: 0700
+            name: tf-operator-entrypoint
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tf-operator-worker
+  namespace: floyd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      v1.cpu-0.mem-1: "true"
+  template:
+    metadata:
+      labels:
+        v1.cpu-0.mem-1: "true"
+        app: "worker"
+    spec:
+      containers:
+        - name: tf-operator
+          image: savvihub/kernels:py37-cuda11.0.full-gpu
+          resources:
+            limits:
+              memory: 1Gi
+          command:
+            - /bin/entrypoint.sh
+          volumeMounts:
+            - name: configmap-volume
+              mountPath: /bin/entrypoint.sh
+              readOnly: true
+              subPath: entrypoint.sh
+          ports:
+            - containerPort: 2222
+              protocol: TCP
+          env:
+            - name: TF_CONFIG
+              value: |
+                {"cluster":{"ps":["tf-operator-ps.floyd.svc.cluster.local:2222"],"worker":["tf-operator-worker.floyd.svc.cluster.local:2222"]},"task":{"type":"worker","index":0}}
+      volumes:
+        - name: configmap-volume
+          configMap:
+            defaultMode: 0700
+            name: tf-operator-entrypoint
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tf-operator-ps
+  namespace: floyd
+spec:
+  selector:
+    app: "ps"
+  ports:
+    - protocol: TCP
+      port: 2222
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tf-operator-worker
+  namespace: floyd
+spec:
+  selector:
+    app: "worker"
+  ports:
+    - protocol: TCP
+      port: 2222
