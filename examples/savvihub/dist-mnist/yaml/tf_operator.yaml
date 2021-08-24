@@ -6,6 +6,8 @@ metadata:
 data:
   entrypoint.sh: |-
     #!/bin/bash
+    apt-get update
+    apt-get install -yq --no-install-recommends git
     git clone https://github.com/savvihub/tf-operator.git
     cd tf-operator
     git checkout savvihub
