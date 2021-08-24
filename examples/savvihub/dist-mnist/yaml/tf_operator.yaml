@@ -47,7 +47,6 @@ spec:
             - name: TF_CONFIG
               value: |
                 {"cluster":{"ps":["tf-operator-ps:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"ps","index":0}}
-      restartPolicy: Never
       nodeSelector:
         nvidia.com/gpu.product: GeForce-RTX-3090
       volumes:
@@ -93,7 +92,6 @@ spec:
             - name: TF_CONFIG
               value: |
                 {"cluster":{"ps":["tf-operator-ps:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"worker","index":0}}
-      restartPolicy: Never
       nodeSelector:
         nvidia.com/gpu.product: GeForce-RTX-3080
       volumes:
