@@ -42,10 +42,9 @@ import sys
 import tempfile
 import time
 
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+import tensorflow as tf
+from tensorflow.examples.tutorials.mnist import input_data
 
-import tensorflow_datasets as tfds
 
 flags = tf.app.flags
 flags.DEFINE_string("data_dir", "/tmp/mnist-data",
@@ -111,8 +110,9 @@ def main(unused_argv):
     FLAGS.job_name = task_type
     FLAGS.task_index = task_index
 
+    mnist = input_data.read_data_sets(FLAGS.data_dir, one_hot=True)
     # mnist = tf.keras.datasets.mnist.load_data()
-    mnist = tfds.load(name="mnist")
+    # mnist = tfds.load(name="mnist")
 
     if FLAGS.download_only:
         sys.exit(0)

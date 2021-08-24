@@ -6,7 +6,6 @@ metadata:
 data:
   entrypoint.sh: |-
     #!/bin/bash
-    pip install tensorflow-datasets
     git clone https://github.com/savvihub/tf-operator.git
     cd tf-operator
     git checkout savvihub
@@ -30,7 +29,7 @@ spec:
     spec:
       containers:
         - name: tf-operator
-          image: savvihub/kernels:py37-cuda11.0.full-gpu
+          image: tensorflow/tensorflow:1.5.0
           resources:
             limits:
               memory: 1Gi
@@ -71,7 +70,7 @@ spec:
     spec:
       containers:
         - name: tf-operator
-          image: savvihub/kernels:py37-cuda11.0.full-gpu
+          image: tensorflow/tensorflow:1.5.0
           resources:
             limits:
               memory: 1Gi
