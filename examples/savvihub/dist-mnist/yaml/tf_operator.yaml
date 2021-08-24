@@ -22,12 +22,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      v1.cpu-0.mem-1: "true"
+      app: ps
   template:
     metadata:
       labels:
-        v1.cpu-0.mem-1: "true"
-        app: "ps"
+        app: ps
     spec:
       containers:
         - name: tf-operator
@@ -47,7 +46,9 @@ spec:
           env:
             - name: TF_CONFIG
               value: |
-                {"cluster":{"ps":["tf-operator-ps.floyd.svc.cluster.local:2222"],"worker":["tf-operator-worker.floyd.svc.cluster.local:2222"]},"task":{"type":"ps","index":0}}
+                {"cluster":{"ps":["tf-operator-ps:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"ps","index":0}}
+      nodeSelector:
+        nvidia.com/gpu.product: GeForce-RTX-3090
       volumes:
         - name: configmap-volume
           configMap:
@@ -59,15 +60,16 @@ kind: Deployment
 metadata:
   name: tf-operator-worker
   namespace: floyd
+  labels:
+    app: worker
 spec:
   replicas: 1
   selector:
     matchLabels:
-      v1.cpu-0.mem-1: "true"
+      app: worker
   template:
     metadata:
       labels:
-        v1.cpu-0.mem-1: "true"
         app: "worker"
     spec:
       containers:
@@ -89,7 +91,9 @@ spec:
           env:
             - name: TF_CONFIG
               value: |
-                {"cluster":{"ps":["tf-operator-ps.floyd.svc.cluster.local:2222"],"worker":["tf-operator-worker.floyd.svc.cluster.local:2222"]},"task":{"type":"worker","index":0}}
+                {"cluster":{"ps":["tf-operator-ps:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"worker","index":0}}
+      nodeSelector:
+        nvidia.com/gpu.product: GeForce-RTX-3080
       volumes:
         - name: configmap-volume
           configMap:
@@ -103,10 +107,12 @@ metadata:
   namespace: floyd
 spec:
   selector:
-    app: "ps"
+    app: ps
   ports:
     - protocol: TCP
       port: 2222
+      targetPort: 2222
+  type: NodePort
 ---
 apiVersion: v1
 kind: Service
@@ -115,7 +121,9 @@ metadata:
   namespace: floyd
 spec:
   selector:
-    app: "worker"
+    app: worker
   ports:
     - protocol: TCP
       port: 2222
+      targetPort: 2222
+  type: NodePort
