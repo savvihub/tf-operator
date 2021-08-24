@@ -6,6 +6,7 @@ metadata:
 data:
   entrypoint.sh: |-
     #!/bin/bash
+    pip install tensorflow-datasets
     git clone https://github.com/savvihub/tf-operator.git
     cd tf-operator
     git checkout savvihub
