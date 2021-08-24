@@ -89,11 +89,11 @@ IMAGE_PIXELS = 28
 
 
 # Example:
-cluster = {'ps': ['host1:2222', 'host2:2222'],
-           'worker': ['host3:2222', 'host4:2222', 'host5:2222']}
-os.environ['TF_CONFIG'] = json.dumps(
-    {'cluster': cluster,
-     'task': {'type': 'worker', 'index': 1}})
+# cluster = {'ps': ['host1:2222', 'host2:2222'],
+#            'worker': ['host3:2222', 'host4:2222', 'host5:2222']}
+# os.environ['TF_CONFIG'] = json.dumps(
+#     {'cluster': cluster,
+#      'task': {'type': 'worker', 'index': 1}})
 
 
 def main(unused_argv):
