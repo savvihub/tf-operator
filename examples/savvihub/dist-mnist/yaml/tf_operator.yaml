@@ -13,16 +13,12 @@ data:
     git checkout savvihub
     python examples/savvihub/dist-mnist/dist_mnist.py
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: tf-operator-ps
   namespace: floyd
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: ps
   template:
     metadata:
       labels:
@@ -47,6 +43,7 @@ spec:
             - name: TF_CONFIG
               value: |
                 {"cluster":{"ps":["tf-operator-ps:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"ps","index":0}}
+      restartPolicy: Never
       nodeSelector:
         nvidia.com/gpu.product: GeForce-RTX-3090
       volumes:
@@ -55,22 +52,18 @@ spec:
             defaultMode: 0700
             name: tf-operator-entrypoint
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: batch/v1
+kind: Job
 metadata:
   name: tf-operator-worker
   namespace: floyd
   labels:
     app: worker
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: worker
   template:
     metadata:
       labels:
-        app: "worker"
+        app: worker
     spec:
       containers:
         - name: tf-operator
@@ -92,6 +85,7 @@ spec:
             - name: TF_CONFIG
               value: |
                 {"cluster":{"ps":["tf-operator-ps:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"worker","index":0}}
+      restartPolicy: Never
       nodeSelector:
         nvidia.com/gpu.product: GeForce-RTX-3080
       volumes:
