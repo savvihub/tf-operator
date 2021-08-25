@@ -36,6 +36,7 @@ from __future__ import division
 from __future__ import print_function
 
 import json
+import logging
 import math
 import os
 import sys
@@ -122,8 +123,8 @@ def main(unused_argv):
     if FLAGS.task_index is None or FLAGS.task_index == "":
         raise ValueError("Must specify an explicit `task_index`")
 
-    print("job name = %s" % FLAGS.job_name)
-    print("task index = %d" % FLAGS.task_index)
+    logging.info("job name = %s" % FLAGS.job_name)
+    logging.info("task index = %d" % FLAGS.task_index)
 
     cluster_config = tf_config.get('cluster', {})
     ps_hosts = cluster_config.get('ps')
