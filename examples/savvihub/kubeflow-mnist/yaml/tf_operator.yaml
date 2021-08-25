@@ -11,7 +11,7 @@ data:
     git clone https://github.com/savvihub/tf-operator.git
     cd tf-operator
     git checkout savvihub
-    python examples/savvihub/kubeflow-mnist/main.py
+    python examples/savvihub/kubeflow-mnist/main.py --tf-model-dir=s3://346565156483-mnist/mnist --tf-export-dir=s3://346565156483-mnist/mnist/export --tf-train-steps=200 --tf-batch-size=100 --tf-learning-rate=0.01
 ---
 apiVersion: batch/v1
 kind: Job
