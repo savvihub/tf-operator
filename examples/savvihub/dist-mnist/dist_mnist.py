@@ -273,10 +273,10 @@ def main(unused_argv):
                   FLAGS.task_index)
 
         if FLAGS.existing_servers:
-            server_grpc_url = "grpc://" + worker_spec[FLAGS.task_index]
-            print("Using existing server at: %s" % server_grpc_url)
+            server_http_url = "http://" + worker_spec[FLAGS.task_index]
+            print("Using existing server at: %s" % server_http_url)
 
-            sess = sv.prepare_or_wait_for_session(server_grpc_url, config=sess_config)
+            sess = sv.prepare_or_wait_for_session(server_http_url, config=sess_config)
         else:
             sess = sv.prepare_or_wait_for_session(server.target, config=sess_config)
 
