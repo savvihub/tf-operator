@@ -26,12 +26,15 @@ spec:
     spec:
       containers:
         - name: tf-operator
-          image: tensorflow/tensorflow:1.15.2-py3
-          resources:
-            limits:
-              memory: 1Gi
+          image: 346565156483.dkr.ecr.ap-northeast-2.amazonaws.com/mnist:724BA434
           command:
-            - /bin/entrypoint.sh
+            - python
+            - /opt/model.py
+            - --tf-model-dir=s3://346565156483-mnist/mnist
+            - --tf-export-dir=s3://346565156483-mnist/mnist/export
+            - --tf-train-steps=200
+            - --tf-batch-size=100
+            - --tf-learning-rate=0.01
           volumeMounts:
             - name: configmap-volume
               mountPath: /bin/entrypoint.sh
@@ -79,12 +82,15 @@ spec:
     spec:
       containers:
         - name: tf-operator
-          image: tensorflow/tensorflow:1.15.2-py3
-          resources:
-            limits:
-              memory: 1Gi
+          image: 346565156483.dkr.ecr.ap-northeast-2.amazonaws.com/mnist:724BA434
           command:
-            - /bin/entrypoint.sh
+            - python
+            - /opt/model.py
+            - --tf-model-dir=s3://346565156483-mnist/mnist
+            - --tf-export-dir=s3://346565156483-mnist/mnist/export
+            - --tf-train-steps=200
+            - --tf-batch-size=100
+            - --tf-learning-rate=0.01
           volumeMounts:
             - name: configmap-volume
               mountPath: /bin/entrypoint.sh
@@ -133,12 +139,15 @@ spec:
     spec:
       containers:
         - name: tf-operator
-          image: tensorflow/tensorflow:1.15.2-py3
-          resources:
-            limits:
-              memory: 1Gi
+          image: 346565156483.dkr.ecr.ap-northeast-2.amazonaws.com/mnist:724BA434
           command:
-            - /bin/entrypoint.sh
+            - python
+            - /opt/model.py
+            - --tf-model-dir=s3://346565156483-mnist/mnist
+            - --tf-export-dir=s3://346565156483-mnist/mnist/export
+            - --tf-train-steps=200
+            - --tf-batch-size=100
+            - --tf-learning-rate=0.01
           volumeMounts:
             - name: configmap-volume
               mountPath: /bin/entrypoint.sh
