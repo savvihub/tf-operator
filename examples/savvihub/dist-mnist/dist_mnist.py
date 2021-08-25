@@ -138,6 +138,8 @@ def main(unused_argv):
     # Construct the cluster and start the server
     ps_spec = FLAGS.ps_hosts.split(",")
     worker_spec = FLAGS.worker_hosts.split(",")
+    print("ps_spec:", ps_spec)
+    print("worker_spec:", worker_spec)
 
     # Get the number of workers.
     num_workers = len(worker_spec)
