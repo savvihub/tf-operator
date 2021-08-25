@@ -148,7 +148,7 @@ def main(unused_argv):
     if not FLAGS.existing_servers:
         print("Not using existing servers. Create an in-process server.")
         server = tf.train.Server(
-            cluster, protocol="grpc+verbs", job_name=FLAGS.job_name, task_index=FLAGS.task_index)
+            cluster, job_name=FLAGS.job_name, task_index=FLAGS.task_index)
         if FLAGS.job_name == "ps":
             print("Server join start")
             server.join()
