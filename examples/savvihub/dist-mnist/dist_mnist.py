@@ -74,7 +74,7 @@ flags.DEFINE_boolean(
     "wherein the parameter updates from workers are aggregated "
     "before applied to avoid stale gradients")
 flags.DEFINE_boolean(
-    "existing_servers", False, "Whether servers already exists. If True, "
+    "existing_servers", True, "Whether servers already exists. If True, "
                                "will use the worker hosts via their GRPC URLs (one client process "
                                "per worker host). Otherwise, will create an in-process TensorFlow "
                                "server.")
@@ -273,10 +273,10 @@ def main(unused_argv):
                   FLAGS.task_index)
 
         if FLAGS.existing_servers:
-            server_http_url = "http://" + worker_spec[FLAGS.task_index]
-            print("Using existing server at: %s" % server_http_url)
+            server_grpc_url = "grpc://" + worker_spec[FLAGS.task_index]
+            print("Using existing server at: %s" % server_grpc_url)
 
-            sess = sv.prepare_or_wait_for_session(server_http_url, config=sess_config)
+            sess = sv.prepare_or_wait_for_session(server_grpc_url, config=sess_config)
         else:
             sess = sv.prepare_or_wait_for_session(server.target, config=sess_config)
 
