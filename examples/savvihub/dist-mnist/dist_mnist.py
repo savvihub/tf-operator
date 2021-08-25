@@ -141,17 +141,22 @@ def main(unused_argv):
 
     # Get the number of workers.
     num_workers = len(worker_spec)
+    print("Num workers:", num_workers)
 
     cluster = tf.train.ClusterSpec({"ps": ps_spec, "worker": worker_spec})
 
     if not FLAGS.existing_servers:
-        # Not using existing servers. Create an in-process server.
+        print("Not using existing servers. Create an in-process server.")
         server = tf.train.Server(
             cluster, job_name=FLAGS.job_name, task_index=FLAGS.task_index)
         if FLAGS.job_name == "ps":
+            print("Server join start")
             server.join()
+            print("Finished Join!")
 
     is_chief = (FLAGS.task_index == 0)
+    print("is_chief:", is_chief)
+
     if FLAGS.num_gpus > 0:
         # Avoid gpu allocation conflict: now allocate task_num -> #gpu
         # for each worker in the corresponding machine
@@ -161,6 +166,8 @@ def main(unused_argv):
         # Just allocate the CPU to worker server
         cpu = 0
         worker_device = "/job:worker/task:%d/cpu:%d" % (FLAGS.task_index, cpu)
+
+    print("worker_device:", worker_device)
     # The device setter will automatically place Variables ops on separate
     # parameter servers (ps). The non-Variable ops will be placed on the workers.
     # The ps use CPU and workers use corresponding GPU
@@ -169,7 +176,9 @@ def main(unused_argv):
                 worker_device=worker_device,
                 ps_device="/job:ps/cpu:0",
                 cluster=cluster)):
+        print("===== In tf.device ======")
         global_step = tf.Variable(0, name="global_step", trainable=False)
+        print("global step:", global_step)
 
         # Variables of the hidden layer
         hid_w = tf.Variable(
@@ -177,7 +186,9 @@ def main(unused_argv):
                 [IMAGE_PIXELS * IMAGE_PIXELS, FLAGS.hidden_units],
                 stddev=1.0 / IMAGE_PIXELS),
             name="hid_w")
+        print("hid_w:", hid_w)
         hid_b = tf.Variable(tf.zeros([FLAGS.hidden_units]), name="hid_b")
+        print("hid_b:", hid_b)
 
         # Variables of the softmax layer
         sm_w = tf.Variable(
@@ -185,7 +196,9 @@ def main(unused_argv):
                 [FLAGS.hidden_units, 10],
                 stddev=1.0 / math.sqrt(FLAGS.hidden_units)),
             name="sm_w")
+        print("sm_w:", sm_w)
         sm_b = tf.Variable(tf.zeros([10]), name="sm_b")
+        print("sm_b:", sm_b)
 
         # Ops: located on the worker specified with FLAGS.task_index
         x = tf.placeholder(tf.float32, [None, IMAGE_PIXELS * IMAGE_PIXELS])
@@ -199,6 +212,7 @@ def main(unused_argv):
 
         opt = tf.train.AdamOptimizer(FLAGS.learning_rate)
 
+        print("Sync_replicas:", FLAGS.sync_replicas)
         if FLAGS.sync_replicas:
             if FLAGS.replicas_to_aggregate is None:
                 replicas_to_aggregate = num_workers

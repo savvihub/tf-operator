@@ -11,7 +11,7 @@ data:
     git clone https://github.com/savvihub/tf-operator.git
     cd tf-operator
     git checkout savvihub
-    python examples/savvihub/dist-mnist/dist_mnist.py
+    python examples/savvihub/dist-mnist/dist_mnist.py --sync-replicas true
 ---
 apiVersion: batch/v1
 kind: Job
@@ -42,52 +42,10 @@ spec:
           env:
             - name: TF_CONFIG
               value: |
-                {"cluster":{"ps":["tf-operator-ps:2222"],"chief":["tf-operator-chief:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"ps","index":0}}
+                {"cluster":{"ps":["tf-operator-ps:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"ps","index":0}}
       restartPolicy: Never
       nodeSelector:
         nvidia.com/gpu.product: GeForce-RTX-3090
-      volumes:
-        - name: configmap-volume
-          configMap:
-            defaultMode: 0700
-            name: tf-operator-entrypoint
----
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: tf-operator-chief
-  namespace: floyd
-  labels:
-    app: chief
-spec:
-  template:
-    metadata:
-      labels:
-        app: chief
-    spec:
-      containers:
-        - name: tf-operator
-          image: tensorflow/tensorflow:1.5.0
-          resources:
-            limits:
-              memory: 1Gi
-          command:
-            - /bin/entrypoint.sh
-          volumeMounts:
-            - name: configmap-volume
-              mountPath: /bin/entrypoint.sh
-              readOnly: true
-              subPath: entrypoint.sh
-          ports:
-            - containerPort: 2222
-              protocol: TCP
-          env:
-            - name: TF_CONFIG
-              value: |
-                {"cluster":{"ps":["tf-operator-ps:2222"],"chief":["tf-operator-chief:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"chief","index":0}}
-      restartPolicy: Never
-      nodeSelector:
-        nvidia.com/gpu.product: GeForce-RTX-3080
       volumes:
         - name: configmap-volume
           configMap:
@@ -113,6 +71,7 @@ spec:
           resources:
             limits:
               memory: 1Gi
+              nvidia.com/gpu: 1
           command:
             - /bin/entrypoint.sh
           volumeMounts:
@@ -126,7 +85,7 @@ spec:
           env:
             - name: TF_CONFIG
               value: |
-                {"cluster":{"ps":["tf-operator-ps:2222"],"chief":["tf-operator-chief:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"worker","index":0}}
+                {"cluster":{"ps":["tf-operator-ps:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"worker","index":0}}
       restartPolicy: Never
       nodeSelector:
         nvidia.com/gpu.product: GeForce-RTX-3080
@@ -144,20 +103,6 @@ metadata:
 spec:
   selector:
     app: ps
-  ports:
-    - protocol: TCP
-      port: 2222
-      targetPort: 2222
-  type: NodePort
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: tf-operator-chief
-  namespace: floyd
-spec:
-  selector:
-    app: chief
   ports:
     - protocol: TCP
       port: 2222
