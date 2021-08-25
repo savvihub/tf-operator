@@ -24,6 +24,8 @@ spec:
       labels:
         app: ps
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: tf-operator
           image: 346565156483.dkr.ecr.ap-northeast-2.amazonaws.com/mnist:724BA434
@@ -80,6 +82,8 @@ spec:
       labels:
         app: chief
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: tf-operator
           image: 346565156483.dkr.ecr.ap-northeast-2.amazonaws.com/mnist:724BA434
@@ -137,6 +141,8 @@ spec:
       labels:
         app: worker
     spec:
+      imagePullSecrets:
+        - name: regcred
       containers:
         - name: tf-operator
           image: 346565156483.dkr.ecr.ap-northeast-2.amazonaws.com/mnist:724BA434
