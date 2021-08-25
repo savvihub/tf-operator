@@ -43,6 +43,18 @@ spec:
             - name: TF_CONFIG
               value: |
                 {"cluster":{"ps":["tf-operator-ps:2222"],"chief":["tf-operator-chief:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"ps","index":0}}
+            - name: AWS_REGION
+              value: ap-northeast-2
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: AWS_SECRET_ACCESS_KEY
       restartPolicy: Never
       nodeSelector:
         nvidia.com/gpu.product: GeForce-RTX-3090
@@ -85,6 +97,18 @@ spec:
             - name: TF_CONFIG
               value: |
                 {"cluster":{"ps":["tf-operator-ps:2222"],"chief":["tf-operator-chief:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"chief","index":0}}
+            - name: AWS_REGION
+              value: ap-northeast-2
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: AWS_SECRET_ACCESS_KEY
       restartPolicy: Never
       nodeSelector:
         nvidia.com/gpu.product: GeForce-RTX-3080
@@ -127,6 +151,18 @@ spec:
             - name: TF_CONFIG
               value: |
                 {"cluster":{"ps":["tf-operator-ps:2222"],"chief":["tf-operator-chief:2222"],"worker":["tf-operator-worker:2222"]},"task":{"type":"worker","index":0}}
+            - name: AWS_REGION
+              value: ap-northeast-2
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-secret
+                  key: AWS_SECRET_ACCESS_KEY
       restartPolicy: Never
       nodeSelector:
         nvidia.com/gpu.product: GeForce-RTX-3080
